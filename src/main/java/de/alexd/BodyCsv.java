@@ -11,6 +11,7 @@ public class BodyCsv {
 
     private static final String HEADER =
             "Datum,Körpergröße,Gewicht,Hals,Bauchumfang,KFA-NAVY,BMI";
+    private static final double KFA_NAVY_OFFSET = 36.76;
 
     private final Path datei;
 
@@ -91,15 +92,31 @@ public class BodyCsv {
 
     private double calcKfa(double heightCm, double neckCm, double waistCm) {
 
+        if (heightCm <= 0 || neckCm <= 0 || waistCm <= 0) {
+            throw new IllegalArgumentException("Größe, Hals- und Bauchumfang müssen größer als 0 sein.");
+        }
+
+        if (!Double.isFinite(heightCm) || !Double.isFinite(neckCm) || !Double.isFinite(waistCm)) {
+            throw new IllegalArgumentException("Größe, Hals- und Bauchumfang müssen gültige Zahlen sein.");
+        }
+
         if (waistCm <= neckCm) {
             throw new IllegalArgumentException(
                     "Bauchumfang muss größer als Halsumfang sein."
             );
         }
 
-        return 86.010 * log10(waistCm - neckCm)
+        double kfa = 86.010 * log10(waistCm - neckCm)
                 - 70.041 * log10(heightCm)
-                + 30.30;
+                + KFA_NAVY_OFFSET;
+
+        if (kfa < 0) {
+            throw new IllegalArgumentException(
+                    "Unplausibler KFA (< 0). Bitte Masseinheiten und Messwerte pruefen (cm erwartet)."
+            );
+        }
+
+        return kfa;
     }
 
     /**
