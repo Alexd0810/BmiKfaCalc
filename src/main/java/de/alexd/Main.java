@@ -14,8 +14,6 @@ public class Main {
         double neck = enterDoubleData(scanner, "Enter your neck circumference in cm");
         double waist = enterDoubleData(scanner, "Enter your waist circumference in cm");
 
-
-
         try {
             // Datensatz hinzufügen
             csv.appendEntry(
